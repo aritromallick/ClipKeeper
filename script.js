@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const NOTIFICATION_DURATION = 3000; // 3 seconds
     const MAX_DISPLAYED_CHARS = 300;
     const LOCAL_STORAGE_KEY = 'clipboardManagerHistory';
+    const THEME_STORAGE_KEY = 'clipboardManagerTheme';
     
     // Initialize the app
     function init() {
@@ -161,6 +162,13 @@ document.addEventListener('DOMContentLoaded', function() {
             deleteClipboardItem(id);
         }
         
+        // Check for pin button click
+        if (target.classList.contains('pin-btn') || target.closest('.pin-btn')) {
+            const item = target.closest('.clipboard-item');
+            const id = item.dataset.id;
+            togglePinClipboardItem(id);
+        }
+        
         // Check for item click (to copy)
         if (target.classList.contains('clipboard-content') || target.closest('.clipboard-content')) {
             const item = target.closest('.clipboard-item');
@@ -171,6 +179,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 copyToClipboard(entry.content);
             }
         }
+    }
+    
+    // Toggle pin state for a clipboard item
+    function togglePinClipboardItem(id) {
+        const entry = findEntryById(id);
+        if (!entry) return;
+        
+        entry.pinned = !entry.pinned;
+        
+        // If pinned, move to top after sorting
+        if (entry.pinned) {
+            // Remove the entry from its current position
+            state.clipboardHistory = state.clipboardHistory.filter(item => item.id !== id);
+            // Add it back at the beginning
+            state.clipboardHistory.unshift(entry);
+            showNotification('Item pinned to top', 'success');
+        } else {
+            showNotification('Item unpinned', 'info');
+        }
+        
+        // Sort the list: pinned items first, then by timestamp
+        state.clipboardHistory.sort((a, b) => {
+            if (a.pinned && !b.pinned) return -1;
+            if (!a.pinned && b.pinned) return 1;
+            // If same pin status, sort by timestamp (newest first)
+            return new Date(b.timestamp) - new Date(a.timestamp);
+        });
+        
+        updateHistoryList();
+        saveToLocalStorage();
     }
     
     // Find entry by ID
@@ -200,7 +238,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const newEntry = {
                 id: generateId(),
                 content: content,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                pinned: false
             };
             
             state.clipboardHistory.unshift(newEntry);
@@ -340,11 +379,19 @@ document.addEventListener('DOMContentLoaded', function() {
             const date = new Date(entry.timestamp);
             const formattedDate = formatDate(date);
             
+            // Add pinned class if the item is pinned
+            if (entry.pinned) {
+                li.classList.add('pinned');
+            }
+            
             li.innerHTML = `
                 <div class="clipboard-content">${escapeHtml(displayContent)}</div>
                 <div class="clipboard-metadata">
                     <span class="clipboard-time">${formattedDate}</span>
                     <div class="clipboard-actions">
+                        <button class="action-btn pin-btn ${entry.pinned ? 'active' : ''}" title="${entry.pinned ? 'Unpin' : 'Pin'} item">
+                            <i class="fas ${entry.pinned ? 'fa-thumbtack' : 'fa-thumbtack'}"></i>
+                        </button>
                         <button class="action-btn copy-btn" title="Copy to clipboard">
                             <i class="fas fa-copy"></i>
                         </button>
