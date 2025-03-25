@@ -1,19 +1,19 @@
 const CACHE_NAME = 'clipboard-manager-v1';
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/styles.css',
-  '/script.js',
-  '/manifest.json',
-  '/icons/icon-72x72.png',
-  '/icons/icon-96x96.png',
-  '/icons/icon-128x128.png',
-  '/icons/icon-144x144.png',
-  '/icons/icon-152x152.png',
-  '/icons/icon-192x192.png',
-  '/icons/icon-384x384.png',
-  '/icons/icon-512x512.png',
-  '/icons/icon.svg'
+  './',
+  './index.html',
+  './styles.css',
+  './script.js',
+  './manifest.json',
+  './icons/icon-72x72.png',
+  './icons/icon-96x96.png',
+  './icons/icon-128x128.png',
+  './icons/icon-144x144.png',
+  './icons/icon-152x152.png',
+  './icons/icon-192x192.png',
+  './icons/icon-384x384.png',
+  './icons/icon-512x512.png',
+  './icons/icon.svg'
 ];
 
 // Install event - Cache static assets
@@ -77,7 +77,7 @@ self.addEventListener('fetch', event => {
         }).catch(() => {
           // If network request fails and its a document, serve offline page
           if (event.request.mode === 'navigate') {
-            return caches.match('/'); // Return main page for offline navigation
+            return caches.match('./index.html'); // Return main page for offline navigation
           }
           
           // If we can't fetch and it's not a navigation, just return undefined
