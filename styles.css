@@ -502,6 +502,75 @@ kbd {
     transform: translateY(0) scale(0.95);
 }
 
+/* PWA Install Button */
+.install-container {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    z-index: 1000;
+    animation: bounce 1s infinite alternate;
+}
+
+.install-button {
+    padding: 10px 16px;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color-1));
+    color: white;
+    border-radius: 25px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.install-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.install-button i {
+    font-size: 1.1rem;
+}
+
+@keyframes bounce {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        transform: translateY(-10px);
+    }
+}
+
+/* Offline notification */
+.offline-indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--warning-color);
+    color: #000;
+    text-align: center;
+    padding: 8px;
+    font-size: 0.9rem;
+    z-index: 1001;
+    display: none;
+}
+
+.offline-indicator.visible {
+    display: block;
+    animation: slideDown 0.5s forwards;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
 /* Responsive styles */
 @media (max-width: 768px) {
     .container {

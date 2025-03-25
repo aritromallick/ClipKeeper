@@ -17,6 +17,11 @@
     <meta name="apple-mobile-web-app-title" content="ClipManager">
 </head>
 <body>
+    <!-- Offline indicator -->
+    <div id="offline-indicator" class="offline-indicator">
+        <i class="fas fa-wifi"></i> You are currently offline. Some features may be limited.
+    </div>
+    
     <div class="container">
         <header>
             <div class="title-section">
@@ -75,6 +80,105 @@
         </button>
     </div>
     
+    <!-- Install PWA Button -->
+    <div id="install-container" class="install-container hidden">
+        <button id="install-button" class="install-button">
+            <i class="fas fa-download"></i> Install App
+        </button>
+    </div>
+
     <script src="script.js"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+        // Register the service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker registration failed: ', error);
+                    });
+                
+                // Listen for messages from service worker
+                navigator.serviceWorker.addEventListener('message', event => {
+                    if (event.data && event.data.type === 'SYNC_COMPLETE') {
+                        showNotification(event.data.message, 'success');
+                    }
+                });
+            });
+            
+            // Setup for PWA installation
+            let deferredPrompt;
+            const installContainer = document.getElementById('install-container');
+            const installButton = document.getElementById('install-button');
+            
+            window.addEventListener('beforeinstallprompt', (e) => {
+                // Prevent Chrome 67 and earlier from automatically showing the prompt
+                e.preventDefault();
+                // Stash the event so it can be triggered later
+                deferredPrompt = e;
+                // Show the install button
+                installContainer.classList.remove('hidden');
+                
+                installButton.addEventListener('click', () => {
+                    // Hide the install button
+                    installContainer.classList.add('hidden');
+                    // Show the prompt
+                    deferredPrompt.prompt();
+                    // Wait for the user to respond to the prompt
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('User accepted the install prompt');
+                            showNotification('App installed successfully!', 'success');
+                        } else {
+                            console.log('User dismissed the install prompt');
+                        }
+                        // Clear the deferredPrompt variable
+                        deferredPrompt = null;
+                    });
+                });
+            });
+            
+            // Handle installed event
+            window.addEventListener('appinstalled', (evt) => {
+                console.log('App was installed');
+                installContainer.classList.add('hidden');
+            });
+            
+            // Offline/online detection
+            const offlineIndicator = document.getElementById('offline-indicator');
+            
+            function updateOnlineStatus() {
+                if (navigator.onLine) {
+                    offlineIndicator.classList.remove('visible');
+                    // Register for sync when we come back online
+                    if ('sync' in navigator.serviceWorker) {
+                        navigator.serviceWorker.ready
+                            .then(registration => {
+                                return registration.sync.register('sync-clipboard-items');
+                            })
+                            .then(() => {
+                                console.log('Sync registered for clipboard items');
+                            })
+                            .catch(err => {
+                                console.error('Sync registration failed:', err);
+                            });
+                    }
+                } else {
+                    offlineIndicator.classList.add('visible');
+                    showNotification('You are offline. Changes will be saved when you reconnect.', 'warning');
+                }
+            }
+            
+            window.addEventListener('online', updateOnlineStatus);
+            window.addEventListener('offline', updateOnlineStatus);
+            
+            // Initial check
+            updateOnlineStatus();
+        }
+    </script>
 </body>
 </html>
