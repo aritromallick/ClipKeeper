@@ -105,11 +105,45 @@ document.addEventListener('DOMContentLoaded', function() {
                 // If text changed and not empty
                 if (text && text !== lastText) {
                     lastText = text;
+                    
+                    // Show system notification if the tab is not active
+                    if (document.hidden && 'Notification' in window) {
+                        if (Notification.permission === 'granted') {
+                            showClipboardNotification(text);
+                        } else if (Notification.permission !== 'denied') {
+                            Notification.requestPermission().then(permission => {
+                                if (permission === 'granted') {
+                                    showClipboardNotification(text);
+                                }
+                            });
+                        }
+                    }
+                    
                     addToClipboardHistory(text);
                 }
             } catch (error) {
                 console.error('Failed to read clipboard:', error);
             }
+        }
+        
+        // Function to show system notification
+        function showClipboardNotification(text) {
+            // Truncate long text for notification
+            const truncatedText = text.length > 50 ? text.substring(0, 50) + '...' : text;
+            
+            const notification = new Notification('New Clipboard Item', {
+                body: truncatedText,
+                icon: '/favicon.ico'
+            });
+            
+            // When notification is clicked, focus this tab
+            notification.onclick = function() {
+                window.focus();
+                notification.close();
+            };
+            
+            // Auto close after 5 seconds
+            setTimeout(() => notification.close(), 5000);
         }
         
         // Initial check
@@ -126,6 +160,17 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Store interval ID for cleanup if needed
         state.clipboardIntervalId = intervalId;
+        
+        // Request notification permission on start
+        if ('Notification' in window && Notification.permission === 'default') {
+            updateStatus('Click "Allow" to enable clipboard notifications', 'warning');
+            
+            // Try to request permission when user interacts with the page
+            document.addEventListener('click', function requestNotificationPermission() {
+                Notification.requestPermission();
+                document.removeEventListener('click', requestNotificationPermission);
+            }, { once: true });
+        }
     }
     
     // Setup all event listeners
@@ -146,6 +191,29 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Initialize theme from stored preference
             loadThemePreference();
+        }
+        
+        // Quick save clipboard button
+        const quickSaveBtn = document.getElementById('quick-save-btn');
+        if (quickSaveBtn) {
+            quickSaveBtn.addEventListener('click', async () => {
+                if (navigator.clipboard) {
+                    try {
+                        const text = await navigator.clipboard.readText();
+                        if (text) {
+                            addToClipboardHistory(text);
+                            showNotification('Current clipboard content saved', 'success');
+                        } else {
+                            showNotification('Clipboard is empty', 'info');
+                        }
+                    } catch (error) {
+                        console.error('Failed to read clipboard:', error);
+                        showNotification('Could not access clipboard. Please check permissions.', 'error');
+                    }
+                } else {
+                    showNotification('Clipboard API not supported in this browser', 'error');
+                }
+            });
         }
     }
     
