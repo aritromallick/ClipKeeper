@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clipboard Manager</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Clipboard Manager</h1>
+            <div class="header-controls">
+                <button id="clear-all" title="Clear All Entries">
+                    <i class="fas fa-trash-alt"></i> Clear All
+                </button>
+                <div class="search-container">
+                    <input type="text" id="search-input" placeholder="Search clipboard...">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div id="clipboard-status" class="status-message">
+                <i class="fas fa-info-circle"></i>
+                <span id="status-text">Waiting for clipboard access...</span>
+            </div>
+            
+            <div id="empty-state" class="empty-state hidden">
+                <i class="fas fa-clipboard"></i>
+                <p>Your clipboard history is empty</p>
+                <p class="empty-state-subtext">Copy something to get started!</p>
+            </div>
+
+            <ul id="clipboard-history" class="clipboard-list">
+                <!-- Clipboard entries will be added here dynamically -->
+            </ul>
+        </main>
+
+        <footer>
+            <div class="shortcut-info">
+                <span><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>V</kbd> to open/close</span>
+                <span><kbd>Esc</kbd> to minimize</span>
+            </div>
+            <div class="app-info">
+                <span id="entry-count">0 items</span>
+                <span>v1.0</span>
+            </div>
+        </footer>
+    </div>
+
+    <div id="notifications" class="notifications"></div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
