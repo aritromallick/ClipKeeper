@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
         isListening: false,
         filteredHistory: [],
         isAppHidden: false,
+        isDarkMode: false,
         appVersion: '1.0'
     };
     

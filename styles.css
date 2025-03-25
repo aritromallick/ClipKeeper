@@ -1,6 +1,7 @@
 :root {
-    --primary-color: #3498db;
-    --primary-dark: #2980b9;
+    /* Light theme colors */
+    --primary-color: #4a6fd0;
+    --primary-dark: #3a59b6;
     --background-color: #f8f9fa;
     --card-bg: #ffffff;
     --border-color: #e0e0e0;
@@ -9,8 +10,31 @@
     --danger-color: #e74c3c;
     --success-color: #2ecc71;
     --warning-color: #f39c12;
+    --accent-color-1: #9b59b6;
+    --accent-color-2: #1abc9c;
+    --accent-color-3: #f1c40f;
     --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     --transition: all 0.3s ease;
+    --gradient-bg: linear-gradient(135deg, rgba(74, 111, 208, 0.1) 0%, rgba(155, 89, 182, 0.1) 100%);
+}
+
+/* Dark theme colors */
+.dark-theme {
+    --primary-color: #70a1ff;
+    --primary-dark: #4a6fd0;
+    --background-color: #1a1a2e;
+    --card-bg: #252941;
+    --border-color: #393e46;
+    --text-color: #f0f0f0;
+    --text-secondary: #c8c8c8;
+    --danger-color: #ff6b6b;
+    --success-color: #48dbad;
+    --warning-color: #ffd369;
+    --accent-color-1: #bb86fc;
+    --accent-color-2: #03dac6;
+    --accent-color-3: #ffae00;
+    --shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    --gradient-bg: linear-gradient(135deg, rgba(74, 111, 208, 0.2) 0%, rgba(155, 89, 182, 0.2) 100%);
 }
 
 * {
@@ -47,16 +71,64 @@ header {
     padding: 20px;
     border-bottom: 1px solid var(--border-color);
     display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background-image: var(--gradient-bg);
+}
+
+.title-section {
+    display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 15px;
+    width: 100%;
 }
 
 h1 {
     font-size: 1.8rem;
     color: var(--primary-color);
     font-weight: 600;
+    background: linear-gradient(to right, var(--primary-color), var(--accent-color-1));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.theme-toggle {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+}
+
+.theme-toggle:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--primary-color);
+    transform: rotate(15deg);
+}
+
+.dark-theme .theme-toggle i.fa-moon {
+    display: none;
+}
+
+.dark-theme .theme-toggle i.fa-sun {
+    display: inline;
+}
+
+.theme-toggle i.fa-sun {
+    display: none;
+}
+
+.theme-toggle i.fa-moon {
+    display: inline;
 }
 
 .header-controls {
@@ -160,7 +232,20 @@ main {
 }
 
 .clipboard-item:hover {
-    background-color: rgba(52, 152, 219, 0.05);
+    background-color: rgba(74, 111, 208, 0.08);
+}
+
+.clipboard-item.pinned {
+    background-color: rgba(155, 89, 182, 0.08);
+    border-left: 4px solid var(--accent-color-1);
+}
+
+.dark-theme .clipboard-item.pinned {
+    background-color: rgba(187, 134, 252, 0.1);
+}
+
+.clipboard-item.pinned:hover {
+    background-color: rgba(155, 89, 182, 0.15);
 }
 
 .clipboard-content {
@@ -171,6 +256,12 @@ main {
     max-height: 100px;
     overflow: hidden;
     position: relative;
+    padding-left: 5px;
+    border-radius: 4px;
+}
+
+.clipboard-item.pinned .clipboard-content {
+    font-weight: 500;
 }
 
 .clipboard-metadata {
@@ -201,8 +292,20 @@ main {
     color: var(--primary-color);
 }
 
-.action-btn.delete:hover {
+.action-btn.delete-btn:hover {
     color: var(--danger-color);
+}
+
+.action-btn.pin-btn:hover {
+    color: var(--accent-color-1);
+}
+
+.action-btn.pin-btn.active {
+    color: var(--accent-color-1);
+}
+
+.clipboard-item.pinned .action-btn.pin-btn {
+    color: var(--accent-color-1);
 }
 
 .empty-state {
