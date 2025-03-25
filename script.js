@@ -138,6 +138,60 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Delegate click events for clipboard items
         clipboardHistoryEl.addEventListener('click', handleClipboardItemActions);
+        
+        // Theme toggle button
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', toggleDarkMode);
+            
+            // Initialize theme from stored preference
+            loadThemePreference();
+        }
+    }
+    
+    // Toggle dark mode
+    function toggleDarkMode() {
+        state.isDarkMode = !state.isDarkMode;
+        applyTheme();
+        saveThemePreference();
+        showNotification(`${state.isDarkMode ? 'Dark' : 'Light'} mode enabled`, 'info');
+    }
+    
+    // Apply current theme
+    function applyTheme() {
+        if (state.isDarkMode) {
+            document.body.classList.add('dark-theme');
+        } else {
+            document.body.classList.remove('dark-theme');
+        }
+    }
+    
+    // Save theme preference
+    function saveThemePreference() {
+        try {
+            localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(state.isDarkMode));
+        } catch (error) {
+            console.error('Failed to save theme preference:', error);
+        }
+    }
+    
+    // Load theme preference
+    function loadThemePreference() {
+        try {
+            const stored = localStorage.getItem(THEME_STORAGE_KEY);
+            if (stored !== null) {
+                state.isDarkMode = JSON.parse(stored);
+                applyTheme();
+            } else {
+                // Check for system preference
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    state.isDarkMode = true;
+                    applyTheme();
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load theme preference:', error);
+        }
     }
     
     // Handle all clipboard item action clicks
